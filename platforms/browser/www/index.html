@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<!--
+    Copyright (c) 2012-2016 Adobe Systems Incorporated. All rights reserved.
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    <!-- This is a wide open CSP declaration. To lock this down for production, see below. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *" />
+    <!-- Good default declaration:
+    * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+    * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+    * Disables use of eval() and inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+        * Enable inline JS: add 'unsafe-inline' to default-src
+        * Enable eval(): add 'unsafe-eval' to default-src
+    * Create your own at http://cspisawesome.com
+    -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
+
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+    <title>Group Proj Uploader</title>
+</head>
+
+<body>
+<!-- Mobile Page -->
+<!-- <div data-role="page" id="homePage">
+    <header data-role="header">
+        <h1>Photo Access</h1>
+    </header>
+
+    <div data-role="content">
+        <div class="ui-field-contain">
+            <label for="selectKeys">Available Keys</label>
+            <select name="selectKeys" id="selectKeys"></select>
+        </div>
+        <a href="#dialog" class="ui-shadow ui-btn ui-corner-all ui-btn-inline" data-transition="pop" id="openModal">Create New Key</a>
+
+        <div>
+            <h1 id="keyTitle"></h1>
+        </div>
+    </div>
+
+</div> -->
+<!-- end of front page -->
+
+<!-- Dialog only page -->
+<!-- <div data-role="dialog" id="dialog">
+    <div data-role="header">
+        <h1>Create New Key</h1>
+    </div>
+    <div data-role="content">
+        <div id="popupNewKey" class="ui-corner-all">
+            <form>
+                <div>
+                    <h3>Please type in new key</h3>
+                    <label for="newKeyNum">New Key Number:</label>
+                    <input type="text" name="newKeyNum" id="newKeyNum" value="">
+                    <label for="newKeyName">Key Name:</label>
+                    <input type="text" name="newKeyName" id="newKeyName" value="">
+                    <button type="submit" class="ui-btn ui-corner-all ui-shadow ui-btn-b" id="submitNewKey">Submit this key</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div> -->
+    <!-- image shown here -->
+    <img src="" id="myImage" />
+
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+        <script>
+        //haruna
+        $(function() {
+            var keyArray = [];
+            function keyObj(id, num, name) {
+                this.keyId = id;
+                this.keyNum = num;
+                this.keyName = name;
+            }
+
+            function pageLoaded() {
+                if (localStorage.getItem("keyArray")) {
+                    keyArray = JSON.parse(localStorage.keyArray);
+                    listUpKeys(keyArray);
+                }
+                console.log(keyArray);
+            }
+
+            // display option tag into select
+            function listUpKeys(checkkey) {
+                for (var i = 0; i < checkkey.length; i += 1) {
+                    $("#selectKeys").append("<option value='" + checkkey[i].keyName + "'>" + checkkey[i].keyName + "</option>")
+                }
+            }
+
+            $("#submitNewKey").on("click", function (newKey) {
+                // value of unique id
+                var lastId, lastArray;
+                if (keyArray.length >= 1) {
+                    lastArray = parseInt(keyArray.length) - 1;
+                    lastId = parseInt(keyArray[lastArray].keyId);
+                }
+                else {
+                    lastId = 0;
+                }
+
+                // get new key information
+                var newId = lastId + 1;
+                var newKeyNum = $("#newKeyNum").val();
+                var newKeyName = $("#newKeyName").val();
+
+                // create new object with new key information
+                newKey = new keyObj(newId, newKeyNum, newKeyName);
+                // new Array include keyArray and new object
+                var newKeyArr = [...keyArray, newKey];
+                localStorage.setItem("keyArray", JSON.stringify(newKeyArr));
+                window.location.reload();
+            })
+
+            $("#selectKeys").on("change", function () {
+                console.log(this.value);
+                $("#keyTitle").text(this.value);
+            });
+
+            //pageLoaded();
+        //jquery
+        });
+        document.addEventListener("deviceready", onDeviceReady, false);
+            function onDeviceReady() {
+                //pageLoaded();
+            };
+
+            function cameraSuccess(imageData) {
+                var image = document.getElementById('myImage');
+                image.src = imageData;
+
+            }
+
+            function cameraError() {
+                alert("camera error");
+            }
+
+            function setOptions(srcType) {
+                var options = {
+                    // Some common settings are 20, 50, and 100
+                    quality: 50,
+                    destinationType: Camera.DestinationType.FILE_URI,
+                    // In this app, dynamically set the picture source, Camera or photo gallery
+                    sourceType: srcType,
+                    encodingType: Camera.EncodingType.JPEG,
+                    mediaType: Camera.MediaType.PICTURE,
+                    allowEdit: true,
+                    correctOrientation: true  //Corrects Android orientation quirks
+                }
+                return options;
+            }
+            
+            function openCamera(){
+                var srcType = Camera.PictureSourceType.SAVEDPHOTOALBUM;
+                var cameraOptions = setOptions(srcType);
+                navigator.camera.getPicture(cameraSuccess, cameraError, cameraOptions);
+            }
+
+            function uploadPhoto() {
+                alert("uploading photo");
+                //selected photo URI is in the src attribute (we set this on getPhoto)
+                var imageURI = document.getElementById('myImage').getAttribute("src");
+                if (!imageURI) {
+                    alert('Please select an image first.');
+                    return;
+                }
+
+                //set upload options
+                var options = new FileUploadOptions();
+                options.chunkedMode = false;
+                options.headers = {
+                    Connection: "close"
+                };
+                options.fileKey = "file";
+                options.fileName = imageURI.substr(imageURI.lastIndexOf('/') + 1);
+                options.mimeType = "image/jpg";
+                alert(options.fileName);
+                var ft = new FileTransfer();
+                //ajax file path to node backend
+                ft.upload(imageURI, encodeURI("https://share-image-app.herokuapp.com/api/upload"), win, fail, options);
+                //const uploadInput = $('#myImage');
+                //const formData = new FormData();
+                //alert('file', uploadInput[0]);
+                //formData.append('uploadImage', uploadInput[0].files[0]);
+
+                /*
+                $.ajax({
+                    url: 'https://share-image-app.herokuapp.com/api/upload',
+                    type: 'POST',
+                    data: options,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        //uploadInput.val('');
+                        console.log(data);
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                })
+                */
+            }
+
+            // Called if something bad happens.
+            //
+            function onFail(message) {
+                console.log('Failed because: ' + message);
+            }
+
+            function win(r) {
+                alert("success");
+                console.log("Code = " + r.responseCode);
+                console.log("Response = " + r.response);
+                //alert("Response =" + r.response);
+                console.log("Sent = " + r.bytesSent);
+            }
+
+            function fail(error) {
+                alert("An error has occurred: Code = " + error.code);
+                console.log("upload error source " + error.source);
+                console.log("upload error target " + error.target);
+            }
+
+            
+        </script>
+        <br>
+        <a href="#" onClick="uploadPhoto();">Upload</a>
+        <a href="#" onClick="openCamera();">Take Photo</a>
+</body>
+
+</html>

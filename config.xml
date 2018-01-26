@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<widget id        = "com.abendago.basic"
+       version   = "1.0.0"
+       xmlns     = "http://www.w3.org/ns/widgets"
+       xmlns:gap = "http://phonegap.com/ns/1.0">
+
+       <name>Group Image Uploader</name>
+       <description>A photo app</description>
+       <author>Nina, Tak, Haruna</author>
+     
+       <platform name="ios"/>
+
+       <plugin name="cordova-plugin-whitelist" version="1" />
+       <plugin name="org.apache.cordova.device" />
+       <plugin name="org.apache.cordova.splashscreen" source="npm"/>
+       <plugin name="cordova-plugin-file-transfer" source="npm" spec="~1.5.0" />
+       
+       <gap:plugin spec="https://github.com/mapsplugin/cordova-plugin-googlemaps" source="git">
+           <param name="API_KEY_FOR_ANDROID" value="AIzaSyDEfC0zRZm8g7Dp3T0-xhJz29W-TRYARwY" />
+       </gap:plugin>
+
+
+       <!-- https://cordova.apache.org/docs/en/latest/reference/cordova-plugin-camera/index.html -->
+
+       <access origin="*"/>
+
+</widget>
